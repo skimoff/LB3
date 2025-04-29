@@ -2,48 +2,60 @@
 
 class Program
 {
-    static void printArray(int[] array)
+    static Random random = new Random();
+
+    static void printArray(int[] array, int size)
     {
-        int size = array.Length;
         for (int i = 0; i < size; i++)
-        {
             Console.Write(array[i] + " ");
-        }
     }
 
-    static void fillArray(int[] array)
+    static void fillArray(int[] array, int size)
     {
-        int size = array.Length;
         for (int i = 0; i < size; i++)
-        {
             array[i] = Convert.ToInt32(Console.ReadLine());
-        }
     }
 
-    static void fillArrayRandom(int[] array)
+    static void fillArrayRandom(int[] array, int size)
     {
-        Random random = new Random();
-        int size = array.Length;
         for (int i = 0; i < size; i++)
-        {
             array[i] = random.Next(51);
+    }
+
+    static void fillArrayFile(int[] array, int size)
+    {
+        using (StreamReader input = new StreamReader("in1.txt"))
+        {
+            for (int i = 0; i < size; i++)
+                array[i] = Convert.ToInt32(input.ReadLine());
         }
     }
 
-    static void fillArrayFile(int[] array)
+    static int createSize()
     {
-        StreamReader input = new StreamReader("in1.txt");
-        int size = array.Length;
-        for (int i = 0; i < size; i++)
+        int size;
+        int count = 0;
+        do
         {
-            array[i] = Convert.ToInt32(input.ReadLine());
-        }
+            Console.WriteLine("Enter size(1-100)");
+            size = Convert.ToInt32(Console.ReadLine());
+            if (size < 1 || size > 100)
+            {
+                count++;
+            }
+
+            if (count >= 3)
+            {
+                size = 20;
+            }
+        } while (count != 3);
+
+        return size;
     }
 
     static void task1()
     {
-        StreamReader input = new StreamReader("in1.txt");
-        int size = 10;
+        int size = createSize();
         int[] arr = new int[size];
 
         Console.WriteLine("enter values yourself(1), randomly(2) or from a file(3): ");
@@ -52,35 +64,33 @@ class Program
         switch (pr)
         {
             case 1:
-                fillArray(arr);
+                fillArray(arr, size);
                 break;
             case 2:
-                fillArrayRandom(arr);
+                fillArrayRandom(arr, size);
                 break;
             case 3:
-                fillArrayFile(arr);
+                fillArrayFile(arr, size);
                 break;
             default:
-                fillArrayRandom(arr);
+                fillArrayRandom(arr, size);
                 break;
         }
 
         Array.Reverse(arr);
-        printArray(arr);
+        printArray(arr, size);
         Array.Sort(arr, 0, size / 2);
         Array.Reverse(arr, 0, size / 2);
 
         for (int i = size / 2; i < size; i++)
             arr[i] -= arr[(size / 2) - 1];
+
         Console.WriteLine();
-        printArray(arr);
+        printArray(arr, size);
     }
 
-    static void fillTwoArrayRandom(int[,] array)
+    static void fillTwoArrayRandom(int[,] array, int rows, int cols)
     {
-        Random random = new Random();
-        int rows = array.GetLength(0);
-        int cols = array.GetLength(1);
         for (int i = 0; i < rows; i++)
         {
             for (int j = 0; j < cols; j++)
@@ -89,34 +99,30 @@ class Program
             }
         }
     }
-    static void fillTwoArrayFile(int[,] array, string fileName)
+
+    static void fillTwoArrayFile(int[,] array, int rows, int cols, string fileName)
     {
-        StreamReader input = new StreamReader(fileName);
-        Random random = new Random();
-        int rows = array.GetLength(0);
-        int cols = array.GetLength(1);
-        for (int i = 0; i < rows; i++)
+        using (StreamReader input = new StreamReader(fileName))
         {
-            for (int j = 0; j < cols; j++)
+            for (int i = 0; i < rows; i++)
             {
-                int num = Convert.ToInt32(input.ReadLine());
-                array[i, j] = num;
+                for (int j = 0; j < cols; j++)
+                {
+                    array[i, j] = Convert.ToInt32(input.ReadLine());
+                }
             }
         }
-        input.Close();
+        
     }
 
-    static void printTwoArray(int[,] array)
+    static void printTwoArray(int[,] array, int rows, int cols)
     {
-        int rows = array.GetLength(0);
-        int cols = array.GetLength(1);
         for (int i = 0; i < rows; i++)
         {
             for (int j = 0; j < cols; j++)
             {
                 Console.Write(array[i, j] + " ");
             }
-
             Console.WriteLine();
         }
     }
@@ -142,7 +148,6 @@ class Program
 
     static void task2()
     {
-        Random random = new Random();
         int m = 3;
         int g = 4;
         int[,] a = new int[m, g];
@@ -154,22 +159,22 @@ class Program
         pr = Convert.ToInt32(Console.ReadLine());
         if (pr == 1)
         {
-            fillTwoArrayFile(b,"in2.txt");
-            fillTwoArrayFile(c,"in3.txt");
+            fillTwoArrayFile(b, m, g, "in2.txt");
+            fillTwoArrayFile(c, m, g, "in3.txt");
         }
         else
         {
-            fillTwoArrayRandom(b);
-            fillTwoArrayRandom(c);
+            fillTwoArrayRandom(b, m, g);
+            fillTwoArrayRandom(c, m, g);
         }
 
         Console.WriteLine("b: ");
-        printTwoArray(b);
+        printTwoArray(b, m, g);
         Console.WriteLine();
         Console.WriteLine("c: ");
-        printTwoArray(c);
+        printTwoArray(c, m, g);
         Console.WriteLine();
-        
+
         Console.WriteLine("Enter cows:");
         int x = Convert.ToInt32(Console.ReadLine());
         if (x > 0 & x <= m)
@@ -181,12 +186,13 @@ class Program
                 a[i, j] = b[i, j] - c[i, j];
             }
         }
-        printTwoArray(a);
+
+        printTwoArray(a, m, g);
     }
 
     static void Main(string[] args)
     {
-        task1();
+        //task1();
         task2();
         Console.ReadKey();
     }
